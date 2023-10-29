@@ -1051,8 +1051,12 @@ public class FlutterBluePlusPlugin implements
 
                     // see: PhySupport
                     HashMap<String, Object> map = new HashMap<>();
-                    map.put("le_2M", mBluetoothAdapter.isLe2MPhySupported());
-                    map.put("le_coded", mBluetoothAdapter.isLeCodedPhySupported());
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        map.put("le_2M", mBluetoothAdapter.isLe2MPhySupported());
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        map.put("le_coded", mBluetoothAdapter.isLeCodedPhySupported());
+                    }
 
                     result.success(map);
                     break;
@@ -1082,7 +1086,9 @@ public class FlutterBluePlusPlugin implements
                     }
 
                     // set preferred phy
-                    gatt.setPreferredPhy(txPhy, rxPhy, phyOptions);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        gatt.setPreferredPhy(txPhy, rxPhy, phyOptions);
+                    }
 
                     result.success(true);
                     break;
@@ -1265,6 +1271,13 @@ public class FlutterBluePlusPlugin implements
         }
 
         String nextPermission = permissionsNeeded.remove(0);
+
+        // throw error if permission is denied
+//        if (ContextCompat.checkSelfPermission(context, nextPermission)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            operation.op(false, nextPermission);
+//            returns;
+//        }
 
         operationsOnPermission.put(lastEventId, (granted, perm) -> {
             operationsOnPermission.remove(lastEventId);
